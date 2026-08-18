@@ -1,3 +1,5 @@
+GRUPO: GM Software Company.
+
 Loja de Jogos API
 
 A Loja de Jogos API é um sistema desenvolvido em Python utilizando FastAPI para o gerenciamento de jogos disponíveis em uma loja.
