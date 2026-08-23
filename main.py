@@ -1,10 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 app = FastAPI(
     title="Loja de Jogos API",
     description="API para gerenciamento de jogos de uma loja.",
-    version="1.0.0"
+    version="2.0.0"
 )
+
+
+class JogoSchema(BaseModel):
+    nome: str
+    preco: float
+    plataforma: str
+    categoria_id: int
+
 
 jogos = [
     {
@@ -51,5 +60,62 @@ def raiz():
 
 
 @app.get("/jogos")
-def listar_jogos():
+def listar_jogos(nome: str | None = None):
+
+    if nome:
+        jogos_filtrados = [
+            jogo for jogo in jogos
+            if nome.lower() in jogo["nome"].lower()
+        ]
+
+        return jogos_filtrados
+
     return jogos
+
+
+@app.get("/jogos/{id}")
+def buscar_jogo(id: int):
+
+    for jogo in jogos:
+        if jogo["id"] == id:
+            return jogo
+
+    raise HTTPException(
+        status_code=404,
+        detail="Jogo não encontrado."
+    )
+
+
+@app.post("/jogos", status_code=201)
+def cadastrar_jogo(jogo: JogoSchema):
+
+    novo_id = max([jogo["id"] for jogo in jogos], default=0) + 1
+
+    novo_jogo = {
+        "id": novo_id,
+        "nome": jogo.nome,
+        "preco": jogo.preco,
+        "plataforma": jogo.plataforma,
+        "categoria_id": jogo.categoria_id
+    }
+
+    jogos.append(novo_jogo)
+
+    return novo_jogo
+
+
+@app.delete("/jogos/{id}")
+def remover_jogo(id: int):
+
+    for jogo in jogos:
+        if jogo["id"] == id:
+            jogos.remove(jogo)
+
+            return {
+                "mensagem": "Jogo removido com sucesso."
+            }
+
+    raise HTTPException(
+        status_code=404,
+        detail="Jogo não encontrado."
+    )
