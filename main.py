@@ -10,7 +10,7 @@ Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(
-    title="Loja de Jogos API",
+    title="Level Games",
     description="API para gerenciamento de jogos de uma loja.",
     version="3.0.0"
 )

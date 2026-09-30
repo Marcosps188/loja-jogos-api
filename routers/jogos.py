@@ -25,14 +25,14 @@ def get_db():
         db.close()
 
 
-# POST - Cadastrar jogo
+
 @router.post("/", response_model=JogoResponseSchema)
 def criar_jogo(
     jogo: JogoCreateSchema,
     db: Session = Depends(get_db)
 ):
 
-    # Verifica se a plataforma existe
+   
     plataforma = db.query(Plataforma).filter(
         Plataforma.id == jogo.plataforma_id
     ).first()
@@ -43,7 +43,7 @@ def criar_jogo(
             detail="Plataforma não cadastrada."
         )
 
-    # Verifica se a categoria existe
+    
     categoria = db.query(Categoria).filter(
         Categoria.id == jogo.categoria_id
     ).first()
@@ -69,7 +69,7 @@ def criar_jogo(
     return novo_jogo
 
 
-# GET - Listar todos os jogos
+
 @router.get("/", response_model=list[JogoResponseSchema])
 def listar_jogos(
     db: Session = Depends(get_db)
@@ -80,7 +80,7 @@ def listar_jogos(
     return jogos
 
 
-# GET - Buscar jogo pelo ID
+
 @router.get("/{jogo_id}", response_model=JogoResponseSchema)
 def buscar_jogo(
     jogo_id: int,
@@ -100,7 +100,7 @@ def buscar_jogo(
     return jogo
 
 
-# PUT - Atualizar jogo
+
 @router.put("/{jogo_id}", response_model=JogoResponseSchema)
 def atualizar_jogo(
     jogo_id: int,
@@ -108,7 +108,7 @@ def atualizar_jogo(
     db: Session = Depends(get_db)
 ):
 
-    # Procura o jogo
+    
     jogo = db.query(Jogo).filter(
         Jogo.id == jogo_id
     ).first()
@@ -119,7 +119,6 @@ def atualizar_jogo(
             detail="Jogo não encontrado."
         )
 
-    # Verifica se a plataforma existe
     plataforma = db.query(Plataforma).filter(
         Plataforma.id == jogo_atualizado.plataforma_id
     ).first()
@@ -130,7 +129,6 @@ def atualizar_jogo(
             detail="Plataforma não cadastrada."
         )
 
-    # Atualiza SOMENTE os campos permitidos
     jogo.nome = jogo_atualizado.nome
     jogo.preco = jogo_atualizado.preco
     jogo.plataforma_id = jogo_atualizado.plataforma_id
@@ -141,7 +139,6 @@ def atualizar_jogo(
     return jogo
 
 
-# DELETE - Excluir jogo
 @router.delete("/{jogo_id}")
 def deletar_jogo(
     jogo_id: int,
