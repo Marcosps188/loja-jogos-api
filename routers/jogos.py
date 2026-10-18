@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
@@ -26,7 +26,11 @@ def get_db():
 
 
 
-@router.post("/", response_model=JogoResponseSchema)
+@router.post(
+    "/",
+    response_model=JogoResponseSchema,
+    status_code=status.HTTP_201_CREATED
+)
 def criar_jogo(
     jogo: JogoCreateSchema,
     db: Session = Depends(get_db)
