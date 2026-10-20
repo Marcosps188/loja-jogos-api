@@ -2,9 +2,9 @@ GRUPO: GM Software Company.
 
 Integrantes: Marcos V. e Guilherme P.
 
-Loja de Jogos API
+Level Games
 
-A Loja de Jogos API é um sistema desenvolvido em Python utilizando FastAPI para o gerenciamento de jogos disponíveis em uma loja.
+A Level games é um sistema desenvolvido em Python utilizando FastAPI para o gerenciamento de jogos disponíveis em uma loja.
 
 O sistema permite organizar informações sobre os jogos, como nome, preço, plataforma e categoria.
 
