@@ -144,6 +144,16 @@ def atualizar_jogo(
             detail="Plataforma não cadastrada."
         )
 
+    categoria = db.query(Categoria).filter(
+        Categoria.id == jogo_atualizado.categoria_id
+    ).first()
+
+    if not categoria:
+        raise HTTPException(
+            status_code=404,
+            detail="Categoria não cadastrada."
+        )
+
     duplicado = db.query(Jogo).filter(
         Jogo.nome.ilike(jogo_atualizado.nome),
         Jogo.plataforma_id == jogo_atualizado.plataforma_id,
@@ -159,6 +169,7 @@ def atualizar_jogo(
     jogo.nome = jogo_atualizado.nome
     jogo.preco = jogo_atualizado.preco
     jogo.plataforma_id = jogo_atualizado.plataforma_id
+    jogo.categoria_id = jogo_atualizado.categoria_id
 
     db.commit()
     db.refresh(jogo)

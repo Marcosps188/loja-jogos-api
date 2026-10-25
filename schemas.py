@@ -103,6 +103,7 @@ class JogoUpdateSchema(SchemaBase):
     nome: str = Field(min_length=3, max_length=100)
     preco: float = Field(gt=0, le=1000, allow_inf_nan=False)
     plataforma_id: int = Field(gt=0)
+    categoria_id: int = Field(gt=0)
 
     @field_validator("nome", mode="before")
     @classmethod
@@ -116,13 +117,11 @@ class JogoUpdateSchema(SchemaBase):
     def validar_preco(cls, valor):
         return validar_preco_valor(valor)
 
-    @field_validator("plataforma_id", mode="before")
+    @field_validator("plataforma_id", "categoria_id", mode="before")
     @classmethod
-    def validar_id(cls, valor):
+    def validar_ids(cls, valor):
         if isinstance(valor, int) and valor <= 0:
-            raise ValueError(
-                "O identificador da plataforma deve ser positivo."
-            )
+            raise ValueError("O identificador deve ser um número positivo.")
         return valor
 
 
