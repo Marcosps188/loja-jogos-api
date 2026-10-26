@@ -58,6 +58,17 @@ def criar_jogo(
             detail="Categoria não cadastrada."
         )
 
+    duplicado = db.query(Jogo).filter(
+        Jogo.nome.ilike(jogo.nome),
+        Jogo.plataforma_id == jogo.plataforma_id
+    ).first()
+
+    if duplicado:
+        raise HTTPException(
+            status_code=409,
+            detail="Já existe um jogo com esse nome nessa plataforma."
+        )
+
     novo_jogo = Jogo(
         nome=jogo.nome,
         preco=jogo.preco,
@@ -133,9 +144,32 @@ def atualizar_jogo(
             detail="Plataforma não cadastrada."
         )
 
+    categoria = db.query(Categoria).filter(
+        Categoria.id == jogo_atualizado.categoria_id
+    ).first()
+
+    if not categoria:
+        raise HTTPException(
+            status_code=404,
+            detail="Categoria não cadastrada."
+        )
+
+    duplicado = db.query(Jogo).filter(
+        Jogo.nome.ilike(jogo_atualizado.nome),
+        Jogo.plataforma_id == jogo_atualizado.plataforma_id,
+        Jogo.id != jogo_id
+    ).first()
+
+    if duplicado:
+        raise HTTPException(
+            status_code=409,
+            detail="Já existe um jogo com esse nome nessa plataforma."
+        )
+
     jogo.nome = jogo_atualizado.nome
     jogo.preco = jogo_atualizado.preco
     jogo.plataforma_id = jogo_atualizado.plataforma_id
+    jogo.categoria_id = jogo_atualizado.categoria_id
 
     db.commit()
     db.refresh(jogo)

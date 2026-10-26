@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -5,10 +7,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from datetime import datetime
-from pydantic import ValidationError
 
 
 def validar_texto(valor: str, campo: str) -> str:
@@ -29,6 +27,15 @@ def validar_texto(valor: str, campo: str) -> str:
             f"O campo {campo} deve conter no máximo 100 caracteres."
         )
 
+    return valor
+
+
+def validar_preco_valor(valor):
+    if isinstance(valor, (int, float)):
+        if valor <= 0:
+            raise ValueError("O preço deve ser maior que zero.")
+        if valor > 1000:
+            raise ValueError("O preço deve ser no máximo R$ 1.000,00.")
     return valor
 
 
@@ -60,7 +67,7 @@ class SchemaBase(BaseModel):
 
 class JogoCreateSchema(SchemaBase):
     nome: str = Field(min_length=3, max_length=100)
-    preco: float = Field(gt=0)
+    preco: float = Field(gt=0, le=1000, allow_inf_nan=False)
     plataforma_id: int = Field(gt=0)
     categoria_id: int = Field(gt=0)
     usuario: str = Field(min_length=3, max_length=100)
@@ -77,13 +84,12 @@ class JogoCreateSchema(SchemaBase):
     def validar_usuario(cls, valor):
         if isinstance(valor, str):
             return validar_texto(valor, "usuário")
-        return valor 
+        return valor
+
     @field_validator("preco", mode="before")
     @classmethod
     def validar_preco(cls, valor):
-        if isinstance(valor, (int, float)) and valor <= 0:
-            raise ValueError("O preço deve ser maior que zero.")
-        return valor
+        return validar_preco_valor(valor)
 
     @field_validator("plataforma_id", "categoria_id", mode="before")
     @classmethod
@@ -95,10 +101,10 @@ class JogoCreateSchema(SchemaBase):
 
 class JogoUpdateSchema(SchemaBase):
     nome: str = Field(min_length=3, max_length=100)
-    preco: float = Field(gt=0)
+    preco: float = Field(gt=0, le=1000, allow_inf_nan=False)
     plataforma_id: int = Field(gt=0)
+    categoria_id: int = Field(gt=0)
 
-    
     @field_validator("nome", mode="before")
     @classmethod
     def validar_nome(cls, valor):
@@ -109,20 +115,14 @@ class JogoUpdateSchema(SchemaBase):
     @field_validator("preco", mode="before")
     @classmethod
     def validar_preco(cls, valor):
-        if isinstance(valor, (int, float)) and valor <= 0:
-            raise ValueError("O preço deve ser maior que zero.")
-        return valor
+        return validar_preco_valor(valor)
 
-    @field_validator("plataforma_id", mode="before")
+    @field_validator("plataforma_id", "categoria_id", mode="before")
     @classmethod
-    def validar_id(cls, valor):
+    def validar_ids(cls, valor):
         if isinstance(valor, int) and valor <= 0:
-            raise ValueError(
-                "O identificador da plataforma deve ser positivo."
-            )
+            raise ValueError("O identificador deve ser um número positivo.")
         return valor
-
-    
 
 
 class JogoResponseSchema(BaseModel):
